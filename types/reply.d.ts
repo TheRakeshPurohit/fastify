@@ -1,12 +1,11 @@
 import { Buffer } from 'buffer'
-import { FastifyReplyContext } from './context'
 import { FastifyInstance } from './instance'
 import { FastifyBaseLogger } from './logger'
-import { FastifyRequest } from './request'
+import { FastifyRequest, RequestRouteOptions } from './request'
 import { RouteGenericInterface } from './route'
 import { FastifySchema } from './schema'
 import { CallSerializerTypeProvider, FastifyReplyType, FastifyTypeProvider, FastifyTypeProviderDefault, ResolveFastifyReplyType } from './type-provider'
-import { CodeToReplyKey, ContextConfigDefault, HttpKeys, RawReplyDefaultExpression, RawRequestDefaultExpression, RawServerBase, RawServerDefault, ReplyDefault, ReplyKeysToCodes, HttpHeader } from './utils'
+import { CodeToReplyKey, ContextConfigDefault, HttpHeader, HttpKeys, RawReplyDefaultExpression, RawRequestDefaultExpression, RawServerBase, RawServerDefault, ReplyDefault, ReplyKeysToCodes } from './utils'
 
 export interface ReplyGenericInterface {
   Reply?: ReplyDefault;
@@ -40,8 +39,9 @@ export interface FastifyReply<
   TypeProvider extends FastifyTypeProvider = FastifyTypeProviderDefault,
   ReplyType extends FastifyReplyType = ResolveFastifyReplyType<TypeProvider, SchemaCompiler, RouteGeneric>
 > {
+  readonly routeOptions: Readonly<RequestRouteOptions<ContextConfig, SchemaCompiler>>
+
   raw: RawReply;
-  context: FastifyReplyContext<ContextConfig>;
   elapsedTime: number;
   log: FastifyBaseLogger;
   request: FastifyRequest<RouteGeneric, RawServer, RawRequest, SchemaCompiler, TypeProvider>;
@@ -57,10 +57,6 @@ export interface FastifyReply<
   getHeaders(): Record<HttpHeader, number | string | string[] | undefined>;
   removeHeader(key: HttpHeader): FastifyReply<RouteGeneric, RawServer, RawRequest, RawReply, ContextConfig, SchemaCompiler, TypeProvider>;
   hasHeader(key: HttpHeader): boolean;
-  /**
-   * @deprecated The `reply.redirect()` method has a new signature: `reply.reply.redirect(url: string, code?: number)`. It will be enforced in `fastify@v5`'.
-   */
-  redirect(statusCode: number, url: string): FastifyReply<RouteGeneric, RawServer, RawRequest, RawReply, ContextConfig, SchemaCompiler, TypeProvider>;
   redirect(url: string, statusCode?: number): FastifyReply<RouteGeneric, RawServer, RawRequest, RawReply, ContextConfig, SchemaCompiler, TypeProvider>;
   writeEarlyHints(hints: Record<string, string | string[]>, callback?: () => void): void;
   hijack(): FastifyReply<RouteGeneric, RawServer, RawRequest, RawReply, ContextConfig, SchemaCompiler, TypeProvider>;
